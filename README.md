@@ -8,6 +8,10 @@
 
 👉 **[Experience the Live Interactive Studio Demo](https://react-tiptap-editor-one.vercel.app)**
 
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Joshualeexy/react-tiptap-editor/main/assets/editor-preview.png" alt="React TipTap Editor Studio Preview" width="100%" />
+</p>
+
 ---
 
 ## ✨ Features (v2.0 Landmark Release)
