@@ -3,12 +3,28 @@
 > A high-productivity WYSIWYG rich text and blog editor for React with **Universal AI Drafting**, **Google Drive & Dropbox Cloud Import**, freeform resizable media, dual contextual menus, and zero vendor lock-in.
 
 [![npm version](https://img.shields.io/npm/v/@thejoshualab/react-tiptap-editor.svg)](https://www.npmjs.com/package/@thejoshualab/react-tiptap-editor)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Vercel-success?logo=vercel)](https://react-tiptap-editor-one.vercel.app)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
+👉 **[Experience the Live Interactive Studio Demo](https://react-tiptap-editor-one.vercel.app)**
 
 ---
 
-## ✨ Features
+## ✨ Features (v2.0 Landmark Release)
 
+- **Enterprise Two-Tier Toolbar:**
+  - Dedicated tier for fast inline formatting (bold, italic, strike, colors, alignments, lists).
+  - Dedicated tier for typography dropdowns (headings, font family switcher, font size scales, tables, links, media, and HTML source code toggle).
+- **Adaptive Canvas Modes:**
+  - **Document Ready:** Elevated paper sheet with realistic elevation shadows and margins for long-form authoring.
+  - **Classic:** Clean framed container for CMS forms, admin panels, and dashboards.
+  - **Inline:** Zen distraction-free canvas with floating bubble menus on selection.
+- **Advanced Image Resizer & Instant Presets:**
+  - 6 interactive drag handles (4 corners + 2 sides) for fluid scaling.
+  - One-click glassmorphic preset bar: `[ 25% ]` `[ 50% ]` `[ 75% ]` `[ 100% Full Width ]` with real-time pixel readout.
+- **Privacy-Enhanced Media Embeds:**
+  - Responsive YouTube players configured with `nocookie: true` to prevent third-party tracking and cookie blocks.
+  - High-resolution Unsplash stock discovery and cloud image resolution.
 - **Universal AI Copilot (Provider-Agnostic):**
   - Out-of-the-box support for **DeepSeek**, **OpenAI**, **Anthropic Claude**, **Google Gemini**, **Ollama (Local / Offline)**, and **Groq**.
   - Built-in provider switcher with real-time live HTML card previews before insertion.
