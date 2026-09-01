@@ -33,13 +33,15 @@ import MenuFloating from './components/MenuFloating.jsx';
 import MenuBubble from './components/MenuBubble.jsx';
 import EditorStats from './components/EditorStats.jsx';
 import { FontSize } from './extensions/FontSize.js';
+import FontFamily from './extensions/FontFamily.js';
+import ExitBlockHelper from './extensions/ExitBlockHelper.js';
 import { universalAiGenerate, AI_PROVIDERS } from './adapters/aiAdapter.js';
 
 const Editor = ({
   value = '',
   onChange = () => { },
   placeholder = 'Write something amazing...',
-  accentColor = '#3b82f6',
+  accentColor = '#2563eb',
   limit = 0,
   authToken = '',
   aiConfig = {},
@@ -50,12 +52,42 @@ const Editor = ({
   compact = false,
   containerClassName = '',
   seoPreview = null,
+  autoSave = true,
+  autoSaveKey = 'react_tiptap_editor_draft',
+  mode = 'document', // 'document' | 'classic' | 'inline'
+  showModeSwitcher = true,
+  theme = 'light',
 }) => {
+  const [currentMode, setCurrentMode] = useState(mode);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isHtmlMode, setIsHtmlMode] = useState(false);
+  const [rawHtml, setRawHtml] = useState(value);
+
   const [activePopover, setActivePopover] = useState(null);
   const [popoverSubMode, setPopoverSubMode] = useState('url');
   const [popoverInput, setPopoverInput] = useState('');
   const [popoverError, setPopoverError] = useState('');
   
+  // Auto-Save Status
+  const [saveStatus, setSaveStatus] = useState('');
+  const autoSaveTimerRef = useRef(null);
+
+  const handleAutoSave = useCallback((html) => {
+    if (!autoSave || typeof window === 'undefined' || !window.localStorage) return;
+    setSaveStatus('● Saving...');
+    if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+    autoSaveTimerRef.current = setTimeout(() => {
+      try {
+        localStorage.setItem(autoSaveKey, html);
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        setSaveStatus(`✓ Draft saved ${timeStr}`);
+      } catch (err) {
+        console.warn('Auto-save error:', err);
+      }
+    }, 1000);
+  }, [autoSave, autoSaveKey]);
+
   // AI Copilot States
   const [aiTopic, setAiTopic] = useState('');
   const [aiTone, setAiTone] = useState('clear and practical');
@@ -78,7 +110,8 @@ const Editor = ({
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: `prose prose-slate dark:prose-invert max-w-none w-full outline-none bg-transparent transition-all selection:bg-blue-100 dark:selection:bg-blue-900 ${compact ? 'min-h-[280px] p-4 md:p-6' : 'min-h-[450px] p-5 md:p-12'}`,
+        class: `prose prose-slate ${theme === 'dark' ? 'dark:prose-invert' : ''} max-w-none w-full outline-none bg-transparent transition-all selection:bg-blue-100 ${compact ? 'min-h-[280px] p-4 md:p-6' : 'min-h-[450px] p-5 md:p-12'}`,
+        spellcheck: 'false',
       },
       handleDrop: (view, event, slice, moved) => {
         if (!moved && event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length > 0) {
@@ -105,7 +138,11 @@ const Editor = ({
     },
     content: value,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML());
+      const html = editor.getHTML();
+      onChange(html);
+      if (autoSave) {
+        handleAutoSave(html);
+      }
     },
     extensions: [
       StarterKit.configure({
@@ -113,7 +150,7 @@ const Editor = ({
         horizontalRule: false,
         dropcursor: { color: accentColor, width: 2 },
       }),
-      Underline, Subscript, Superscript, Typography, FontSize,
+      Underline, Subscript, Superscript, Typography, FontSize, FontFamily,
       TextAlign.configure({ types: ['heading', 'paragraph'] }),
       Highlight.configure({ multicolor: true }),
       TextStyle, Color,
@@ -128,6 +165,7 @@ const Editor = ({
       }),
       Youtube.configure({
         width: 840,
+        nocookie: true,
         HTMLAttributes: { class: 'aspect-video rounded-xl shadow-2xl mx-auto my-8 border-4 border-white' },
       }),
       Table.configure({ resizable: true }),
@@ -138,6 +176,7 @@ const Editor = ({
       }),
       Placeholder.configure({ placeholder }),
       CharacterCount.configure({ limit: limit || null }),
+      ExitBlockHelper,
     ],
   });
 
@@ -203,6 +242,23 @@ const Editor = ({
     }
   }, [value, editor]);
 
+  // Restore draft if editor is empty and a saved draft exists
+  useEffect(() => {
+    if (!autoSave || typeof window === 'undefined' || !window.localStorage || !editor) return;
+    try {
+      const saved = localStorage.getItem(autoSaveKey);
+      if (saved && (!value || value === '<p></p>' || value === '')) {
+        if (editor.isEmpty) {
+          editor.commands.setContent(saved, false);
+          setSaveStatus('✓ Draft restored');
+          setTimeout(() => setSaveStatus('✓ Draft saved'), 2500);
+        }
+      }
+    } catch (e) {
+      console.warn('Draft restoration failed:', e);
+    }
+  }, [editor, autoSave, autoSaveKey]);
+
   const glassColor = useMemo(() => accentColor + '10', [accentColor]);
   const highlightColor = useMemo(() => accentColor + '30', [accentColor]);
 
@@ -225,7 +281,7 @@ const Editor = ({
   }, [editor]);
 
   const handleAiGenerate = useCallback(async () => {
-    if (!aiTopic.trim()) {
+    if (!aiTopic || typeof aiTopic !== 'string' || !aiTopic.trim()) {
       setAiError('Please enter a topic.');
       return;
     }
@@ -281,51 +337,154 @@ const Editor = ({
     setAiResult(null);
   }, [aiResult, editor, onAiDraftApplied]);
 
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen((prev) => !prev);
+  }, []);
+
+  const toggleHtmlMode = useCallback(() => {
+    setIsHtmlMode((prev) => {
+      const next = !prev;
+      if (next) {
+        setRawHtml(editor ? editor.getHTML() : '');
+      } else {
+        if (editor) {
+          editor.commands.setContent(rawHtml, true);
+          onChange(rawHtml);
+        }
+      }
+      return next;
+    });
+  }, [editor, rawHtml, onChange]);
+
   return (
     <div
-      className={`craft-editor-container tiptap-container ${compact ? 'compact' : ''} relative rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden ${containerClassName}`}
+      className={`craft-editor-container tiptap-container mode-${currentMode} ${isFullscreen ? 'froala-fullscreen' : ''} ${compact ? 'compact' : ''} relative rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden ${theme === 'dark' ? 'dark bg-slate-900 border-slate-800' : ''} ${containerClassName}`}
       style={{
         '--accent': accentColor,
         '--accent-highlight': highlightColor,
       }}
     >
-      <Toolbar
-        editor={editor}
-        activePopover={activePopover}
-        openPopover={openPopover}
-        accentColor={accentColor}
-        glassColor={glassColor}
-        compact={compact}
-        changeFontSize={changeFontSize}
-        highlightColor={highlightColor}
-      />
+      {/* Mode Switcher Bar */}
+      {showModeSwitcher && (
+        <div className="froala-mode-bar">
+          <div className="mode-tabs-group">
+            <span className="mode-caption">Change Mode:</span>
+            <div className="mode-pills">
+              <button
+                type="button"
+                className={`mode-pill ${currentMode === 'classic' ? 'active' : ''}`}
+                onClick={() => setCurrentMode('classic')}
+              >
+                Classic
+              </button>
+              <button
+                type="button"
+                className={`mode-pill ${currentMode === 'inline' ? 'active' : ''}`}
+                onClick={() => setCurrentMode('inline')}
+              >
+                Inline
+              </button>
+              <button
+                type="button"
+                className={`mode-pill ${currentMode === 'document' ? 'active' : ''}`}
+                onClick={() => setCurrentMode('document')}
+              >
+                Document Ready
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Two-Tier Studio Toolbar (Hidden via CSS in Inline mode) */}
+      <div style={{ display: currentMode === 'inline' ? 'none' : 'block' }}>
+        <Toolbar
+          editor={editor}
+          activePopover={activePopover}
+          openPopover={openPopover}
+          accentColor={accentColor}
+          glassColor={glassColor}
+          compact={compact}
+          changeFontSize={changeFontSize}
+          highlightColor={highlightColor}
+          isFullscreen={isFullscreen}
+          toggleFullscreen={toggleFullscreen}
+          isHtmlMode={isHtmlMode}
+          toggleHtmlMode={toggleHtmlMode}
+        />
+      </div>
 
       <MenuFloating editor={editor} openPopover={openPopover} />
       <MenuBubble editor={editor} openPopover={openPopover} highlightColor={highlightColor} />
 
-      <div className="editor-content-wrapper editor-viewport relative">
-        <EditorContent editor={editor} />
+      {/* Raw HTML Code Editor Mode */}
+      <div
+        className="html-editor-container"
+        style={{ display: isHtmlMode ? 'block' : 'none' }}
+      >
+        <textarea
+          className="html-editor-textarea"
+          value={rawHtml}
+          onChange={(e) => setRawHtml(e.target.value)}
+          placeholder="<!-- Enter raw HTML here -->"
+          spellCheck="false"
+        />
       </div>
 
-      <EditorStats editor={editor} limit={limit} />
+      {/* Persistent Single TipTap Canvas Instance (Never unmounted on mode change) */}
+      <div
+        className={`editor-viewport-wrapper ${currentMode === 'document' ? 'document-sheet-backdrop' : 'classic-viewport-backdrop'}`}
+        style={{ display: isHtmlMode ? 'none' : 'flex' }}
+      >
+        <div 
+          className={`editor-content-wrapper relative cursor-text ${currentMode === 'document' ? 'document-paper-sheet' : 'classic-paper-sheet'}`}
+          onClick={(e) => {
+            if (e.target === e.currentTarget && editor) {
+              const lastNode = editor.state.doc.lastChild;
+              if (lastNode && lastNode.type.name !== 'paragraph') {
+                editor.chain().insertContentAt(editor.state.doc.content.size, { type: 'paragraph' }).focus('end').unsetAllMarks().run();
+              } else {
+                editor.commands.focus('end');
+              }
+            }
+          }}
+        >
+          <EditorContent editor={editor} />
+        </div>
+      </div>
+
+      <EditorStats editor={editor} limit={limit} saveStatus={saveStatus} />
 
       <EditorPopover
         activePopover={activePopover}
-        cloudConfig={cloudConfig}
-        active={['link', 'image', 'youtube', 'table'].includes(activePopover)}
         type={activePopover}
+        cloudConfig={cloudConfig}
+        popoverSubMode={popoverSubMode}
         subMode={popoverSubMode}
+        setPopoverSubMode={setPopoverSubMode}
         setSubMode={setPopoverSubMode}
+        popoverInput={popoverInput}
         input={popoverInput}
+        setPopoverInput={setPopoverInput}
         setInput={setPopoverInput}
         linkOpenInNewTab={linkOpenInNewTab}
         setLinkOpenInNewTab={setLinkOpenInNewTab}
+        popoverError={popoverError}
         error={popoverError}
+        setPopoverError={setPopoverError}
+        popoverInputRef={popoverInputEl}
         inputRef={popoverInputEl}
+        closePopover={() => setActivePopover(null)}
         onClose={() => setActivePopover(null)}
         accentColor={accentColor}
+        handleImageUpload={handleImageUpload}
+        onUpload={handleImageUpload}
+        openMediaPicker={() => {
+          setIsMediaPickerOpen(true);
+          setActivePopover(null);
+        }}
         confirmPopover={(resolvedUrl, options = {}) => {
-          const finalUrl = resolvedUrl || popoverInput;
+          const finalUrl = (typeof resolvedUrl === 'string' ? resolvedUrl : (typeof popoverInput === 'string' ? popoverInput : '')).trim();
           if (activePopover === 'link') {
             if (finalUrl) {
               const shouldOpenInNewTab = options.openInNewTab !== undefined ? options.openInNewTab : linkOpenInNewTab;
@@ -343,16 +502,6 @@ const Editor = ({
           }
           setActivePopover(null);
         }}
-        closePopover={() => setActivePopover(null)}
-        handleImageUpload={handleImageUpload}
-        openMediaPicker={() => {
-          setIsMediaPickerOpen(true);
-          setActivePopover(null);
-        }}
-        popoverError={popoverError}
-        setPopoverError={setPopoverError}
-        popoverInputRef={popoverInputEl}
-        onUpload={handleImageUpload}
       />
 
       <AIPopover

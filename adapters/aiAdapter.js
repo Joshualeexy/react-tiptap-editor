@@ -223,7 +223,7 @@ export async function universalAiGenerate({
 }
 
 function parseAiJson(text, fallbackTopic) {
-  let clean = text.trim();
+  let clean = (typeof text === 'string' ? text : (text ? String(text) : '')).trim();
   // Strip code fences if present
   if (clean.includes('```')) {
     const parts = clean.split('```');

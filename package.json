@@ -1,7 +1,7 @@
 {
   "name": "@thejoshualab/react-tiptap-editor",
-  "version": "1.1.0",
-  "description": "Rich text and blog editor with universal AI provider agnosticism, Google Drive & Dropbox cloud pickers, resizable media, and contextual menus.",
+  "version": "2.0.0",
+  "description": "Enterprise-grade React WYSIWYG editor powered by TipTap 2. Features an enterprise two-tier toolbar, document/classic/inline canvas modes, image resizing with presets, responsive media embeds, and built-in AI Copilot.",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
   "types": "./Editor.d.ts",

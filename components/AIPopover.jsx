@@ -184,7 +184,7 @@ const AIPopover = ({
             <button
               type="button"
               onClick={onGenerate}
-              disabled={loading || !topic.trim()}
+              disabled={loading || !(typeof topic === 'string' && topic.trim())}
               className="ai-generate-btn"
               style={{ backgroundColor: accentColor }}
             >
