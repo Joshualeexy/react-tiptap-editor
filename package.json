@@ -1,0 +1,83 @@
+{
+  "name": "@thejoshualab/react-tiptap-editor",
+  "version": "1.1.0",
+  "description": "Rich text and blog editor with universal AI provider agnosticism, Google Drive & Dropbox cloud pickers, resizable media, and contextual menus.",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./Editor.d.ts",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "prepublishOnly": "npm run build"
+  },
+  "sideEffects": [
+    "*.css",
+    "./Editor.css"
+  ],
+  "files": [
+    "dist",
+    "Editor.css",
+    "Editor.d.ts",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./Editor.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
+    },
+    "./Editor.css": "./Editor.css"
+  },
+  "keywords": [
+    "tiptap",
+    "prosemirror",
+    "rich-text",
+    "wysiwyg",
+    "blog-editor",
+    "ai-editor",
+    "google-drive",
+    "dropbox",
+    "markdown"
+  ],
+  "author": "Joshualeexy",
+  "license": "MIT",
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.0",
+    "@fortawesome/free-brands-svg-icons": "^6.5.0",
+    "@fortawesome/free-solid-svg-icons": "^6.5.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
+    "@tiptap/core": "^2.0.0",
+    "@tiptap/extension-character-count": "^2.0.0",
+    "@tiptap/extension-color": "^2.0.0",
+    "@tiptap/extension-highlight": "^2.0.0",
+    "@tiptap/extension-horizontal-rule": "^2.0.0",
+    "@tiptap/extension-image": "^2.0.0",
+    "@tiptap/extension-link": "^2.0.0",
+    "@tiptap/extension-placeholder": "^2.0.0",
+    "@tiptap/extension-subscript": "^2.0.0",
+    "@tiptap/extension-superscript": "^2.0.0",
+    "@tiptap/extension-table": "^2.0.0",
+    "@tiptap/extension-table-cell": "^2.0.0",
+    "@tiptap/extension-table-header": "^2.0.0",
+    "@tiptap/extension-table-row": "^2.0.0",
+    "@tiptap/extension-task-item": "^2.0.0",
+    "@tiptap/extension-task-list": "^2.0.0",
+    "@tiptap/extension-text-align": "^2.0.0",
+    "@tiptap/extension-text-style": "^2.0.0",
+    "@tiptap/extension-typography": "^2.0.0",
+    "@tiptap/extension-underline": "^2.0.0",
+    "@tiptap/extension-youtube": "^2.0.0",
+    "@tiptap/react": "^2.0.0",
+    "@tiptap/starter-kit": "^2.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.2.2"
+  }
+}
