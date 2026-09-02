@@ -63,6 +63,31 @@ function EditorStudioDemo() {
   });
   const [accentColor, setAccentColor] = useState('#2563eb');
   const [copied, setCopied] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMobileMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+
+    if (mobileMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+    }
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileMenuOpen]);
 
   const handleCopyHtml = async () => {
     try {
@@ -90,47 +115,139 @@ function EditorStudioDemo() {
       {/* Top Application Bar */}
       <header className="app-header">
         <div className="header-brand">
-          <span className="brand-icon">✍️</span>
+          <span className="brand-icon" aria-hidden="true">✍️</span>
           <span className="brand-title">Editor Studio</span>
           <a
             href="https://www.npmjs.com/package/@thejoshualab/react-tiptap-editor"
             target="_blank"
             rel="noopener noreferrer"
             className="pkg-badge"
-            title="View on npm"
+            title="View @thejoshualab/react-tiptap-editor on npm"
             style={{ textDecoration: 'none' }}
           >
-            📦 @thejoshualab/react-tiptap-editor v1.1.0 ↗
+            <span className="pkg-badge-icon">📦</span>
+            <span className="pkg-badge-full">@thejoshualab/react-tiptap-editor v1.1.0</span>
+            <span className="pkg-badge-short">v1.1.0</span>
+            <span className="pkg-badge-arrow">↗</span>
           </a>
         </div>
 
         <div className="header-actions">
-          <div className="live-indicator">
+          <div className="live-indicator" title="Editor Engine: WYSIWYG Active">
             <span className="pulse-dot"></span>
-            <span>WYSIWYG Active</span>
+            <span className="live-text-full">WYSIWYG Active</span>
+            <span className="live-text-short">Active</span>
           </div>
 
-          <label className="color-picker-label" title="Change Editor Accent Color">
-            <span>Accent:</span>
-            <input
-              type="color"
-              value={accentColor}
-              onChange={(e) => setAccentColor(e.target.value)}
-              className="color-input"
-            />
+          <label className="color-picker-label" title={`Accent Color: ${accentColor}`}>
+            <span className="accent-label-text">Accent:</span>
+            <div className="color-swatch-wrapper" style={{ backgroundColor: accentColor }}>
+              <input
+                type="color"
+                value={accentColor}
+                onChange={(e) => setAccentColor(e.target.value)}
+                className="color-input"
+                aria-label="Editor accent color"
+              />
+            </div>
           </label>
 
-          <button type="button" className="btn-secondary" onClick={handleResetSample}>
-            Load Sample
+          <button
+            type="button"
+            className="btn-secondary desktop-only-btn"
+            onClick={handleResetSample}
+            title="Reset to sample document"
+          >
+            <span className="btn-text-full">Load Sample</span>
+            <span className="btn-text-short">Sample</span>
           </button>
 
-          <button type="button" className="btn-secondary" onClick={handleClear}>
+          <button
+            type="button"
+            className="btn-secondary desktop-only-btn"
+            onClick={handleClear}
+            title="Clear editor canvas"
+          >
             Clear
           </button>
 
-          <button type="button" className="btn-primary" onClick={handleCopyHtml}>
-            {copied ? '✓ Copied HTML!' : '📋 Copy HTML'}
+          <button
+            type="button"
+            className="btn-primary"
+            onClick={handleCopyHtml}
+            title="Copy editor HTML"
+          >
+            {copied ? (
+              <span>✓ Copied!</span>
+            ) : (
+              <>
+                <span className="btn-icon">📋</span>
+                <span className="copy-text-full">Copy HTML</span>
+                <span className="copy-text-short">Copy</span>
+              </>
+            )}
           </button>
+
+          {/* Mobile Overflow Menu */}
+          <div className="mobile-menu-container" ref={menuRef}>
+            <button
+              type="button"
+              className={`btn-icon-menu ${mobileMenuOpen ? 'active' : ''}`}
+              onClick={() => setMobileMenuOpen((prev) => !prev)}
+              aria-label="More actions"
+              aria-expanded={mobileMenuOpen}
+              title="More actions"
+            >
+              ⋯
+            </button>
+
+            {mobileMenuOpen && (
+              <div className="mobile-dropdown-menu" role="menu">
+                <div className="mobile-dropdown-header">
+                  <span className="pulse-dot"></span>
+                  <span>WYSIWYG Engine Active</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="mobile-dropdown-item"
+                  onClick={() => {
+                    handleResetSample();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <span className="dropdown-item-icon">📄</span>
+                  <span>Load Sample Document</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="mobile-dropdown-item text-danger"
+                  onClick={() => {
+                    handleClear();
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <span className="dropdown-item-icon">🗑️</span>
+                  <span>Clear Canvas</span>
+                </button>
+
+                <div className="mobile-dropdown-divider"></div>
+
+                <a
+                  href="https://www.npmjs.com/package/@thejoshualab/react-tiptap-editor"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mobile-dropdown-item"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{ textDecoration: 'none' }}
+                >
+                  <span className="dropdown-item-icon">📦</span>
+                  <span>npm package (v1.1.0) ↗</span>
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
