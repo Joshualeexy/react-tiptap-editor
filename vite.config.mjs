@@ -14,6 +14,24 @@ export default defineConfig(({ command, mode }) => {
         port: 5173,
         open: false,
       },
+      build: {
+        chunkSizeWarningLimit: 1200,
+        rollupOptions: {
+          output: {
+            manualChunks(id) {
+              if (id.includes('node_modules/react') || id.includes('node_modules/react-dom')) {
+                return 'vendor';
+              }
+              if (id.includes('node_modules/@tiptap') || id.includes('node_modules/prosemirror')) {
+                return 'tiptap';
+              }
+              if (id.includes('node_modules/@fortawesome')) {
+                return 'fontawesome';
+              }
+            },
+          },
+        },
+      },
     };
   }
 
