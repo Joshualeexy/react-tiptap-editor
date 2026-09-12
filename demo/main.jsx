@@ -287,6 +287,10 @@ function EditorStudioDemo() {
           mode="document"
           theme={isDark ? 'dark' : 'light'}
           showModeSwitcher={true}
+          aiConfig={{
+            provider: 'ollama',
+            model: 'qwen3:8b'
+          }}
         />
       </main>
     </div>

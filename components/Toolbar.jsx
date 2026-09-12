@@ -416,7 +416,7 @@ const Toolbar = ({
 
           <button
             type="button"
-            onClick={() => openPopover('video')}
+            onClick={() => openPopover('youtube')}
             title="Embed YouTube Video"
           >
             <FontAwesomeIcon icon={faVideo} />

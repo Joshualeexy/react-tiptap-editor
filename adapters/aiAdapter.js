@@ -44,8 +44,8 @@ export const AI_PROVIDERS = {
     id: 'ollama',
     name: 'Ollama (Local)',
     icon: '🦙',
-    defaultModel: 'llama3.1:8b',
-    models: ['llama3.1:8b', 'mistral-nemo:12b', 'hermes3:8b'],
+    defaultModel: 'qwen3:8b',
+    models: ['qwen3:8b', 'llama3.1:8b', 'mistral-nemo:12b', 'hermes3:8b', 'qwen2.5:7b'],
     baseUrl: 'http://localhost:11434/v1',
     format: 'openai'
   },

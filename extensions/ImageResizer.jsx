@@ -76,6 +76,12 @@ const ImageResizer = (props) => {
     updateAttributes({ width: targetPx });
   };
 
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [node.attrs.src]);
+
   return (
     <NodeViewWrapper 
       className={`image-resizer-wrapper my-4 block text-center ${isNodeSelected ? 'is-selected' : ''}`}
@@ -95,13 +101,26 @@ const ImageResizer = (props) => {
           maxWidth: '100%',
         }}
       >
-        <img
-          src={node.attrs.src}
-          alt={node.attrs.alt || ''}
-          title={node.attrs.title || ''}
-          loading="lazy"
-          referrerPolicy="no-referrer"
-        />
+        {hasError ? (
+          <div className="p-4 bg-slate-900 text-slate-200 rounded-xl border border-red-500/40 text-center my-2 shadow-lg">
+            <div className="text-xl mb-1">⚠️ Image Link Blocked or Invalid</div>
+            <div className="text-xs text-slate-400 max-w-md mx-auto truncate" title={node.attrs.src}>
+              {node.attrs.src}
+            </div>
+            <div className="text-[11px] text-slate-400 mt-2">
+              The external web server blocked hotlinking (ORB/CORS) or the URL points to a web page instead of a direct raw image file (.jpg, .png, .webp).
+            </div>
+          </div>
+        ) : (
+          <img
+            src={node.attrs.src}
+            alt={node.attrs.alt || ''}
+            title={node.attrs.title || ''}
+            loading="lazy"
+            referrerPolicy="no-referrer"
+            onError={() => setHasError(true)}
+          />
+        )}
 
         {/* Quick Size Preset Toolbar on Selection (Positioned at bottom of image) */}
         {isNodeSelected && (

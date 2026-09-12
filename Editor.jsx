@@ -36,6 +36,7 @@ import { FontSize } from './extensions/FontSize.js';
 import FontFamily from './extensions/FontFamily.js';
 import ExitBlockHelper from './extensions/ExitBlockHelper.js';
 import { universalAiGenerate, AI_PROVIDERS } from './adapters/aiAdapter.js';
+import { resolveCloudImageUrl } from './adapters/cloudStorageAdapter.js';
 
 const Editor = ({
   value = '',
@@ -102,8 +103,8 @@ const Editor = ({
   const [aiError, setAiError] = useState('');
   const [aiMessage, setAiMessage] = useState('');
   const [aiLength, setAiLength] = useState(1500);
-  const [aiProvider, setAiProvider] = useState(aiConfig?.provider || 'deepseek');
-  const [aiModel, setAiModel] = useState(aiConfig?.model || '');
+  const [aiProvider, setAiProvider] = useState(aiConfig?.provider || 'ollama');
+  const [aiModel, setAiModel] = useState(aiConfig?.model || 'qwen3:8b');
   const [aiApiKey, setAiApiKey] = useState(aiConfig?.apiKey || '');
   const [aiEndpoint, setAiEndpoint] = useState(aiConfig?.endpoint || '');
 
@@ -503,23 +504,57 @@ const Editor = ({
           setActivePopover(null);
         }}
         confirmPopover={(resolvedUrl, options = {}) => {
-          const finalUrl = (typeof resolvedUrl === 'string' ? resolvedUrl : (typeof popoverInput === 'string' ? popoverInput : '')).trim();
+          const rawUrl = (typeof resolvedUrl === 'string' ? resolvedUrl : (typeof popoverInput === 'string' ? popoverInput : '')).trim();
           if (activePopover === 'link') {
-            if (finalUrl) {
+            if (rawUrl) {
               const shouldOpenInNewTab = options.openInNewTab !== undefined ? options.openInNewTab : linkOpenInNewTab;
               editor?.chain().focus().setLink({
-                href: finalUrl,
+                href: rawUrl,
                 target: shouldOpenInNewTab ? '_blank' : null,
               }).run();
             } else {
               editor?.chain().focus().unsetLink().run();
             }
-          } else if (activePopover === 'image' && finalUrl) {
-            editor?.chain().focus().setImage({ src: finalUrl }).run();
-          } else if (activePopover === 'youtube' && finalUrl) {
-            editor?.commands.setYoutubeVideo({ src: finalUrl });
+          } else if (activePopover === 'image' && rawUrl) {
+            const finalImageSrc = resolveCloudImageUrl(rawUrl) || rawUrl;
+            let ok = false;
+            try {
+              ok = editor?.chain().focus().setImage({ src: finalImageSrc }).run();
+            } catch (_) {}
+
+            if (!ok) {
+              editor?.chain().focus().insertContent(`<p><img src="${finalImageSrc}" alt="Inserted Image" /></p>`).run();
+            }
+          } else if ((activePopover === 'youtube' || activePopover === 'video') && rawUrl) {
+            const videoIdMatch = rawUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+            const videoId = videoIdMatch ? videoIdMatch[1] : null;
+            const cleanWatchUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : rawUrl;
+            const embedUrl = videoId ? `https://www.youtube-nocookie.com/embed/${videoId}` : rawUrl;
+
+            let applied = false;
+            try {
+              applied = editor?.chain().focus().setYoutubeVideo({ src: cleanWatchUrl }).run();
+            } catch (_) {}
+
+            if (!applied) {
+              try {
+                applied = editor?.chain().focus().insertContent({
+                  type: 'youtube',
+                  attrs: { src: cleanWatchUrl }
+                }).run();
+              } catch (_) {}
+            }
+
+            if (!applied) {
+              editor?.chain().focus().insertContent(`
+                <div data-youtube-video="">
+                  <iframe src="${embedUrl}" allowfullscreen="true" frameborder="0"></iframe>
+                </div>
+              `).run();
+            }
           }
           setActivePopover(null);
+          setPopoverInput('');
         }}
       />
 

@@ -40,7 +40,23 @@ export function resolveCloudImageUrl(url) {
     return `${trimmed}${sep}download=1`;
   }
 
-  // 4. Standard Web URL (Unchanged)
+  // 4. Pixabay Link Resolver (Photo pages & Download links)
+  // e.g. https://pixabay.com/photos/suju-foto-whale-10467525/
+  // or https://pixabay.com/images/download/suju-foto-whale-10467525_1920.jpg
+  const pixabayMatch = trimmed.match(/pixabay\.com\/(?:photos|images\/download)\/.*-(\d+)/);
+  if (pixabayMatch && pixabayMatch[1]) {
+    const photoId = pixabayMatch[1];
+    return `https://cdn.pixabay.com/photo/id/${photoId}/1200.jpg`;
+  }
+
+  // 5. YouTube Link Resolver (Short links, shorts, mobile, share URLs)
+  // e.g. https://youtu.be/9VPwJHJxyIg?si=RPXDikcQvQYlCoDq
+  const ytMatch = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|shorts\/|live\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+  if (ytMatch && ytMatch[1]) {
+    return `https://www.youtube.com/watch?v=${ytMatch[1]}`;
+  }
+
+  // 6. Standard Web URL (Unchanged)
   return trimmed;
 }
 

@@ -32,6 +32,16 @@ const AIPopover = ({
 }) => {
   const [showConfig, setShowConfig] = useState(false);
 
+  React.useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (typeof onClose === 'function') onClose();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
   if (!active || typeof document === 'undefined') return null;
 
   const availableProviders = allowedProviders && Array.isArray(allowedProviders) && allowedProviders.length > 0

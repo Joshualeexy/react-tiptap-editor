@@ -93,6 +93,16 @@ const EditorPopover = (props) => {
     }
   }, [cloudMode, stockPhotos.length, stockQuery, fetchStockPhotos]);
 
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (typeof closePopover === 'function') closePopover();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [closePopover]);
+
   if (!activePopover || activePopover === 'ai' || typeof document === 'undefined') return null;
 
   const isImageSelection = activePopover === 'image' && popoverSubMode === 'select';
@@ -193,7 +203,7 @@ const EditorPopover = (props) => {
               ? 'Insert / Edit Link'
               : activePopover === 'image'
               ? 'Insert Image'
-              : activePopover === 'youtube'
+              : (activePopover === 'youtube' || activePopover === 'video')
               ? 'Embed YouTube Video'
               : 'Insert Media'}
           </span>
