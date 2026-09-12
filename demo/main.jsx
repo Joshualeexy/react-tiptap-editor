@@ -62,9 +62,14 @@ function EditorStudioDemo() {
     return SAMPLE_DOCUMENT;
   });
   const [accentColor, setAccentColor] = useState('#2563eb');
+  const [isDark, setIsDark] = useState(false);
   const [copied, setCopied] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = React.useRef(null);
+
+  React.useEffect(() => {
+    document.body.classList.toggle('dark', isDark);
+  }, [isDark]);
 
   React.useEffect(() => {
     const handleClickOutside = (event) => {
@@ -111,7 +116,7 @@ function EditorStudioDemo() {
   };
 
   return (
-    <div className="app-wrapper">
+    <div className={`app-wrapper ${isDark ? 'dark' : ''}`}>
       {/* Top Application Bar */}
       <header className="app-header">
         <div className="header-brand">
@@ -126,8 +131,8 @@ function EditorStudioDemo() {
             style={{ textDecoration: 'none' }}
           >
             <span className="pkg-badge-icon">📦</span>
-            <span className="pkg-badge-full">@thejoshualab/react-tiptap-editor v1.1.0</span>
-            <span className="pkg-badge-short">v1.1.0</span>
+            <span className="pkg-badge-full">@thejoshualab/react-tiptap-editor v2.0.0</span>
+            <span className="pkg-badge-short">v2.0.0</span>
             <span className="pkg-badge-arrow">↗</span>
           </a>
         </div>
@@ -151,6 +156,15 @@ function EditorStudioDemo() {
               />
             </div>
           </label>
+
+          <button
+            type="button"
+            className="btn-secondary"
+            onClick={() => setIsDark((prev) => !prev)}
+            title="Toggle Dark / Light Mode"
+          >
+            {isDark ? '☀️ Light' : '🌙 Dark'}
+          </button>
 
           <button
             type="button"
@@ -212,6 +226,18 @@ function EditorStudioDemo() {
                   type="button"
                   className="mobile-dropdown-item"
                   onClick={() => {
+                    setIsDark((prev) => !prev);
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  <span className="dropdown-item-icon">{isDark ? '☀️' : '🌙'}</span>
+                  <span>Toggle {isDark ? 'Light' : 'Dark'} Mode</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="mobile-dropdown-item"
+                  onClick={() => {
                     handleResetSample();
                     setMobileMenuOpen(false);
                   }}
@@ -243,7 +269,7 @@ function EditorStudioDemo() {
                   style={{ textDecoration: 'none' }}
                 >
                   <span className="dropdown-item-icon">📦</span>
-                  <span>npm package (v1.1.0) ↗</span>
+                  <span>npm package (v2.0.0) ↗</span>
                 </a>
               </div>
             )}
@@ -259,6 +285,7 @@ function EditorStudioDemo() {
           placeholder="Write something amazing..."
           accentColor={accentColor}
           mode="document"
+          theme={isDark ? 'dark' : 'light'}
           showModeSwitcher={true}
         />
       </main>

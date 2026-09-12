@@ -59,9 +59,14 @@ const Editor = ({
   theme = 'light',
 }) => {
   const [currentMode, setCurrentMode] = useState(mode);
+  const [currentTheme, setCurrentTheme] = useState(theme);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isHtmlMode, setIsHtmlMode] = useState(false);
   const [rawHtml, setRawHtml] = useState(value);
+
+  useEffect(() => {
+    if (theme) setCurrentTheme(theme);
+  }, [theme]);
 
   const [activePopover, setActivePopover] = useState(null);
   const [popoverSubMode, setPopoverSubMode] = useState('url');
@@ -358,7 +363,7 @@ const Editor = ({
 
   return (
     <div
-      className={`craft-editor-container tiptap-container mode-${currentMode} ${isFullscreen ? 'froala-fullscreen' : ''} ${compact ? 'compact' : ''} relative rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden ${theme === 'dark' ? 'dark bg-slate-900 border-slate-800' : ''} ${containerClassName}`}
+      className={`craft-editor-container tiptap-container mode-${currentMode} ${isFullscreen ? 'froala-fullscreen' : ''} ${compact ? 'compact' : ''} relative rounded-2xl border overflow-hidden ${currentTheme === 'dark' ? 'dark bg-slate-900 border-slate-800' : 'border-slate-200 bg-white shadow-sm'} ${containerClassName}`}
       style={{
         '--accent': accentColor,
         '--accent-highlight': highlightColor,
@@ -390,6 +395,20 @@ const Editor = ({
                 onClick={() => setCurrentMode('document')}
               >
                 Document Ready
+              </button>
+            </div>
+          </div>
+
+          <div className="mode-tabs-group">
+            <span className="mode-caption">Theme:</span>
+            <div className="mode-pills">
+              <button
+                type="button"
+                className={`mode-pill ${currentTheme === 'dark' ? 'active' : ''}`}
+                onClick={() => setCurrentTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
+                title="Toggle Dark / Light Theme"
+              >
+                {currentTheme === 'dark' ? '🌙 Dark' : '☀️ Light'}
               </button>
             </div>
           </div>

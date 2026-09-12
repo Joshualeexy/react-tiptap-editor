@@ -1552,9 +1552,21 @@
 }
 
 .document-paper-sheet .ProseMirror,
-.mode-document .ProseMirror,
+.mode-document:not(.dark) .ProseMirror,
 .tiptap-container:not(.dark) .ProseMirror {
     color: #1e293b !important;
+}
+
+.dark .document-paper-sheet,
+.dark .classic-paper-sheet {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+.dark .document-paper-sheet .ProseMirror,
+.dark .mode-document .ProseMirror,
+.dark.tiptap-container .ProseMirror {
+    color: #f8fafc !important;
 }
 
 .document-paper-sheet .ProseMirror h1,
@@ -1562,11 +1574,11 @@
 .document-paper-sheet .ProseMirror h3,
 .document-paper-sheet .ProseMirror h4,
 .document-paper-sheet .ProseMirror strong,
-.mode-document .ProseMirror h1,
-.mode-document .ProseMirror h2,
-.mode-document .ProseMirror h3,
-.mode-document .ProseMirror h4,
-.mode-document .ProseMirror strong,
+.mode-document:not(.dark) .ProseMirror h1,
+.mode-document:not(.dark) .ProseMirror h2,
+.mode-document:not(.dark) .ProseMirror h3,
+.mode-document:not(.dark) .ProseMirror h4,
+.mode-document:not(.dark) .ProseMirror strong,
 .tiptap-container:not(.dark) .ProseMirror h1,
 .tiptap-container:not(.dark) .ProseMirror h2,
 .tiptap-container:not(.dark) .ProseMirror h3,
@@ -1575,13 +1587,26 @@
     color: #0f172a !important;
 }
 
+.dark .ProseMirror h1,
+.dark .ProseMirror h2,
+.dark .ProseMirror h3,
+.dark .ProseMirror h4,
+.dark .ProseMirror strong {
+    color: #f8fafc !important;
+}
+
 .document-paper-sheet .ProseMirror p,
 .document-paper-sheet .ProseMirror li,
-.mode-document .ProseMirror p,
-.mode-document .ProseMirror li,
+.mode-document:not(.dark) .ProseMirror p,
+.mode-document:not(.dark) .ProseMirror li,
 .tiptap-container:not(.dark) .ProseMirror p,
 .tiptap-container:not(.dark) .ProseMirror li {
     color: #334155 !important;
+}
+
+.dark .ProseMirror p,
+.dark .ProseMirror li {
+    color: #cbd5e1 !important;
 }
 
 /* HTML Source Editor Mode */
@@ -1737,4 +1762,99 @@
     color: #94a3b8;
     padding-left: 4px;
     border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* ==========================================
+   Comprehensive Dark Mode Styles (.dark)
+   ========================================== */
+.dark.craft-editor-container,
+.dark .craft-editor-container,
+.craft-editor-container.dark {
+    background: #0f172a !important;
+    border-color: #1e293b !important;
+    color: #f8fafc;
+}
+
+.dark .froala-mode-bar {
+    background: #0f172a !important;
+    border-bottom-color: #1e293b !important;
+}
+
+.dark .mode-caption {
+    color: #94a3b8 !important;
+}
+
+.dark .mode-pills {
+    background: #1e293b !important;
+}
+
+.dark .mode-pill {
+    color: #cbd5e1 !important;
+}
+
+.dark .mode-pill:hover {
+    color: #f8fafc !important;
+}
+
+.dark .mode-pill.active {
+    background: #334155 !important;
+    color: #60a5fa !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark .froala-toolbar {
+    background: #0f172a !important;
+    border-bottom-color: #1e293b !important;
+}
+
+.dark .toolbar-tier-top {
+    border-bottom-color: #1e293b !important;
+}
+
+.dark .toolbar-tier button,
+.dark .toolbar-tier .toolbar-color-btn {
+    color: #94a3b8 !important;
+}
+
+.dark .toolbar-tier button:hover,
+.dark .toolbar-tier .toolbar-color-btn:hover {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+}
+
+.dark .toolbar-tier button.active {
+    background: #1e293b !important;
+    color: #60a5fa !important;
+    border-color: #3b82f6 !important;
+}
+
+.dark .toolbar-divider {
+    background-color: #1e293b !important;
+}
+
+.dark .toolbar-select {
+    background: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+.dark .document-sheet-backdrop {
+    background: #090d16 !important;
+}
+
+.dark .classic-viewport-backdrop {
+    background: #0f172a !important;
+}
+
+.dark .document-paper-sheet,
+.dark .classic-paper-sheet {
+    background: #0f172a !important;
+    border-color: #1e293b !important;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark .editor-stats-bar {
+    background: #0f172a !important;
+    border-top-color: #1e293b !important;
+    color: #94a3b8 !important;
 }

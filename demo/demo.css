@@ -22,6 +22,35 @@
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
+body.dark,
+.app-wrapper.dark {
+  --bg-page: #0b0f19;
+  --bg-card: #111827;
+  --border-subtle: #1f2937;
+  --text-main: #f9fafb;
+  --text-muted: #9ca3af;
+  --text-subtle: #6b7280;
+  --tag-bg: #1e293b;
+  --tag-text: #60a5fa;
+  background-color: var(--bg-page);
+  color: var(--text-main);
+}
+
+.dark .app-header {
+  background: #111827;
+  border-bottom: 1px solid #1f2937;
+}
+
+.dark .btn-secondary {
+  background: #1f2937;
+  color: #f3f4f6;
+  border-color: #374151;
+}
+
+.dark .btn-secondary:hover {
+  background: #374151;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
