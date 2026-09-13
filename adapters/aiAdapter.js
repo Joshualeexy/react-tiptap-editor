@@ -141,17 +141,24 @@ export async function universalAiGenerate({
       ...(apiKey ? { Authorization: `Bearer ${apiKey}` } : {})
     };
 
+    const bodyPayload = {
+      model: activeModel,
+      messages: [
+        { role: 'system', content: sysPrompt },
+        { role: 'user', content: userPrompt }
+      ],
+      temperature: 0.7
+    };
+
+    // Turn off thinking/reasoning output for Ollama local instances
+    if (provider === 'ollama') {
+      bodyPayload.think = false;
+    }
+
     const res = await fetch(endpoint, {
       method: 'POST',
       headers,
-      body: JSON.stringify({
-        model: activeModel,
-        messages: [
-          { role: 'system', content: sysPrompt },
-          { role: 'user', content: userPrompt }
-        ],
-        temperature: 0.7
-      })
+      body: JSON.stringify(bodyPayload)
     });
 
     if (!res.ok) {
@@ -224,6 +231,10 @@ export async function universalAiGenerate({
 
 function parseAiJson(text, fallbackTopic) {
   let clean = (typeof text === 'string' ? text : (text ? String(text) : '')).trim();
+
+  // Strip Ollama/reasoning thinking blocks (<think>...</think>)
+  clean = clean.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
+
   // Strip code fences if present
   if (clean.includes('```')) {
     const parts = clean.split('```');
