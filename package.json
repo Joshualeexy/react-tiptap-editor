@@ -1,6 +1,6 @@
 {
   "name": "@thejoshualab/react-tiptap-editor",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Enterprise-grade React WYSIWYG editor powered by TipTap 2. Features an enterprise two-tier toolbar, document/classic/inline canvas modes, image resizing with presets, responsive media embeds, and built-in AI Copilot.",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
